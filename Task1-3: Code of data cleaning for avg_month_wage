@@ -1,0 +1,28 @@
+#Average month wage_CN
+import pandas as pd
+
+# 读取 Excel（假设工资总额和就业人数在一个表里）
+df = pd.read_excel(r"C:\\Users\\bryennt\\Desktop\\就业_工资_CN.xlsx")
+
+# 去除列名里的多余空格（如果存在）
+df.columns = df.columns.str.strip()
+
+# 清洗“就业人数_百万人”和“工资总额_亿元”：去掉空格、非数字
+for col in ['就业人数_百万人', '工资总额_亿元']:
+    df[col] = pd.to_numeric(df[col], errors='coerce')  # 非数字转 NaN
+
+# 去掉有缺失值的行
+df = df.dropna(subset=['就业人数_百万人', '工资总额_亿元'])
+df['年份'] = pd.to_datetime(df['时间'], errors='coerce').dt.year
+
+# 单位换算
+df['工资总额_元'] = df['工资总额_亿元'] * 1e8
+df['就业人数_人'] = df['就业人数_百万人'] * 1e6
+
+# 计算平均月薪
+df['平均月薪_元'] = df['工资总额_元'] / df['就业人数_人'] / 12
+
+# 输出
+result = df[['year', 'avg_month_wage_yuan']]
+print(result)
+result.to_excel(r"C:\Users\bryennt\Desktop\avg_monthly_wage_CN.xlsx", index=False)
