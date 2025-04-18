@@ -1,0 +1,36 @@
+#Weekly working hrs_CN
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# ========== 第一步：读取原始年度数据 ==========
+df = pd.read_excel(r"C:\\Users\\bryennt\\Desktop\\工作时长_CN.xlsx")
+
+# ========== 第二步：用2003–2023年拟合线性回归 ==========
+train_df = df[df['年份'].between(2003, 2023)].dropna()
+X_train = train_df['年份'].values.reshape(-1, 1)
+y_train = train_df['工作时长'].values
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# ========== 第三步：预测2000–2002年 ==========
+missing_years = [2000, 2001, 2002]
+X_pred = np.array(missing_years).reshape(-1, 1)
+y_pred = model.predict(X_pred)
+
+# 构造补全数据
+filled_df = pd.DataFrame({'年份': missing_years, '工作时长': y_pred})
+
+# ========== 第四步：合并原始数据并排序 ==========
+df_combined = pd.concat([df.dropna(), filled_df], ignore_index=True)
+df_combined = df_combined.sort_values('年份').reset_index(drop=True)
+
+# 替换变量名为英文
+df_combined = df_combined.rename(columns={'年份': 'year', '工作时长': 'weekly working hrs'})
+
+# ========== 第五步：输出清洗后的数据 ==========
+output_path = "C:/Users/bryennt/Desktop/annual_working_hours_filled.xlsx"
+df_combined.to_csv(output_path, index=False, encoding='utf-8-sig')
+
+print("补全成功，输出路径：", output_path)
