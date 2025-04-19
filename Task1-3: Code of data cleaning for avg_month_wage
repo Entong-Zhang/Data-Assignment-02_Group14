@@ -1,7 +1,7 @@
 #Average month wage_CN
 import pandas as pd
 
-# 读取 Excel（假设工资总额和就业人数在一个表里）
+# 读取 Excel
 df = pd.read_excel(r"C:\\Users\\bryennt\\Desktop\\就业_工资_CN.xlsx")
 
 # 去除列名里的多余空格（如果存在）
